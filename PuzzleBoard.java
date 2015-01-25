@@ -10,9 +10,9 @@ import java.util.Random;
 
 public class PuzzleBoard {
 
-    private static final int EMPTY_SPACE = 0;
+    // private static final int EMPTY_SPACE = 0;
 
-    private int[][] board;
+    private Tile[][] board;
     private int size;
 
     /* Initializes the state of the board by making an empty board to be filled
@@ -21,7 +21,7 @@ public class PuzzleBoard {
     @param squareSize the size of the board, typically 3x3
     */
     public PuzzleBoard(int squareSize) {
-        this.board = new int[squareSize][squareSize];
+        this.board = new Tile[squareSize][squareSize];
         this.size = squareSize;
         this.init();
     }
@@ -30,17 +30,17 @@ public class PuzzleBoard {
     public PuzzleBoard(int squareSize, int a, int b, int c,
                         int d, int e, int f,
                         int g, int h, int i) {
-        this.board = new int[squareSize][squareSize];
+        this.board = new Tile[squareSize][squareSize];
         this.size = squareSize;
-        this.board[0][0] = a;
-        this.board[0][1] = b;
-        this.board[0][2] = c;
-        this.board[1][0] = d;
-        this.board[1][1] = e;
-        this.board[1][2] = f;
-        this.board[2][0] = g;
-        this.board[2][1] = h;
-        this.board[2][2] = i;
+        this.board[0][0] = new Tile(0, 0, a);
+        this.board[0][1] = new Tile(0, 1, b);
+        this.board[0][2] = new Tile(0, 2, c);
+        this.board[1][0] = new Tile(1, 0, d);
+        this.board[1][1] = new Tile(1, 1, e);
+        this.board[1][2] = new Tile(1, 2, f);
+        this.board[2][0] = new Tile(2, 0, g);
+        this.board[2][1] = new Tile(2, 1, h);
+        this.board[2][2] = new Tile(2, 2, i);
     }
 
     /* Creates a random state of the board. Creates a solved board and then
@@ -52,8 +52,9 @@ public class PuzzleBoard {
 
         for (int i = 0; i < this.size; i++) {
             for (int j = 0; j < this.size; j++) {
-                // Start with a solvec board
-                this.board[i][j] = this.size*i + j;
+                // Start with a solved board
+                // this.board[i][j] = this.size*i + j;
+                this.board[i][j] = new Tile(i, j, this.size*i + j);
             }
         }
 
@@ -61,19 +62,7 @@ public class PuzzleBoard {
         // distribution of random boards
         int randRange = 100;
         int numMoves = rand.nextInt(randRange);
-        int[][] lastMoves = new int[2][2];
-        // lastMoves[0] = position of the empty space
-        // ie. lastMoves[0][0] = row of the empty space, etc
-        // lastMoves[1] = position of the tile just moved
 
-        // Initialize lastMoves to be all 0's
-        for (int i = 0; i < 2; i++) {
-            lastMoves[i][i] = 0;
-        }
-
-        for (int i = 0; i < numMoves; i++) {
-            lastMoves = this.randomMove(lastMoves);
-        }
     }
 
     /* Helper for init(), makes a random move on the board
@@ -87,18 +76,6 @@ public class PuzzleBoard {
 
         Random rand = new Random();
 
-        int blankR = lastMoves[0][0];
-        int blankC = lastMoves[0][1];
-        Set<Integer> nbd = neighborhood(blankR, blankC);
-
-        // Need to add one because you don't want to access 0 elements of
-        // the set and you want to be able to reach the last element
-        int choice = rand.nextInt(nbd.size() + 1);
-        Iterator it = nbd.iterator();
-        int next;
-        for (int i = 0; i < choice; i++) {
-            next = it.next();
-        }
 
         // Need a move() method here...
 
@@ -110,12 +87,18 @@ public class PuzzleBoard {
 
         for (int i = 0; i < this.size; i++) {
             for (int j = 0; j < this.size; j++) {
-                int current = this.board[i][j];
-                if (num == current) {
+                Tile current = this.board[i][j];
+                if (num == current.getVal()) {
                     // You've found the number you're worried about, so check
-                    // if the empty space is next to it
-                    if (this.neighborhood(i, j).contains(EMPTY_SPACE)) {
-                        return true;
+                    // if the empty space is next to it. Unfortunately you
+                    // have to iterate through it, so we lose the efficiency
+                    // of checking set containment. There are a max of 4
+                    // elements here though, so it shouldn't be that bad
+                    Set<Tile> nbd = this.neighborhood(i, j);
+                    for (Tile t : nbd) {
+                        if (t.isEmptySpace()) {
+                            return true;
+                        }
                     }
                 }
             }
@@ -127,8 +110,8 @@ public class PuzzleBoard {
     /* Helper function for moveExists, returns the numbers to the left, right,
     above, and below the given (row, column), if they exist.
     */
-    private Set<Integer> neighborhood(int r, int c) {
-        Set<Integer> nbd = new HashSet<Integer>();
+    private Set<Tile> neighborhood(int r, int c) {
+        Set<Tile> nbd = new HashSet<Tile>();
         if (r > 0) {
             nbd.add(this.board[r-1][c]);
         }
@@ -176,8 +159,8 @@ public class PuzzleBoard {
 
         for (int i = 0; i < this.size; i++) {
             for (int j = 0; j < this.size; j++) {
-                if (this.board[i][j] != this.size*i + j) {
-                    if (this.board[i][j] != EMPTY_SPACE) {
+                if (this.board[i][j].getVal() != this.size*i + j) {
+                    if (!this.board[i][j].isEmptySpace()) {
                         wrongTiles++;   
                     }
                 }
@@ -197,8 +180,8 @@ public class PuzzleBoard {
 
         for (int i = 0; i < this.size; i++) {
             for (int j = 0; j < this.size; j++) {
-                if (this.board[i][j] != EMPTY_SPACE) {
-                    int number = this.board[i][j];
+                if (!this.board[i][j].isEmptySpace()) {
+                    int number = this.board[i][j].getVal();
                     int currentRow = i;
                     int currentCol = j;
                     int goalRow = number / this.size;
@@ -213,7 +196,7 @@ public class PuzzleBoard {
     }
 
     /* Public getter for the board */
-    public int[][] getBoard() {
+    public Tile[][] getBoard() {
         return this.board;
     }
 
