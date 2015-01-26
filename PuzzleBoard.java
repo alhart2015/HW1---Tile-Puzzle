@@ -4,14 +4,16 @@ Alden Hart and Spencer Chadinha
 1/21/2015
 */
 
-import java.util.Set;
-import java.util.HashSet;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.Iterator;
+import java.util.Collections;
 
 public class PuzzleBoard {
 
-    // private static final int EMPTY_SPACE = 0;
+    private static final int EMPTY_SPACE = 0;
+    private static final int LAST_MOVED = 1;
 
     private Tile[][] board;
     private int size;
@@ -66,9 +68,9 @@ public class PuzzleBoard {
         // lastMoved[0] = position of the empty space
         // lastMoved[1] = position of the last Tile moved
         Tile[] lastMoved = new Tile[2];
-        lastMoved[0] = this.board[0][0];
+        lastMoved[EMPTY_SPACE] = this.board[0][0];
         // Pick any tile that can't be moved the first time for this
-        lastMoved[1] = this.board[2][2];
+        lastMoved[LAST_MOVED] = this.board[2][2];
         for (int i = 0; i < numMoves; i++) {
             lastMoved = randomMove(lastMoved);
         }
@@ -90,28 +92,29 @@ public class PuzzleBoard {
 
         Random rand = new Random();
 
-        Tile empty = lastMoved[0];
+        Tile empty = lastMoved[EMPTY_SPACE];
 
-        Set<Tile> nbd = this.neighborhood(empty.getRow(), empty.getCol());
-        int choice = rand.nextInt(nbd.size());
-        Iterator it = nbd.iterator();
-        Tile toMove = new Tile(0, 0, 9);
-        for (int i = 0; i <= choice; i++) {
-            Object toMoveObj = it.next();
-            toMove = (Tile) toMoveObj;
-        }
+        List<Tile> nbd = this.neighborhood(empty.getRow(), empty.getCol());
+        // int choice = rand.nextInt(nbd.size());
+        // Iterator it = nbd.iterator();
+        Tile toMove = new Tile(0, 0, 9);    // Some arbitrary initialization
+        // for (int i = 0; i <= choice; i++) {
+        //     Object toMoveObj = it.next();
+        //     toMove = (Tile) toMoveObj;
+        // }
+        Collections.shuffle(nbd);
 
         // Need a move() method here...
-        System.out.println(toMove);
-        this.move(toMove.getRow(), toMove.getCol(), 
-                  empty.getRow(), empty.getCol());
+        // System.out.println(toMove);
+        // lastMoved = this.move(toMove.getRow(), toMove.getCol(), 
+        //           empty.getRow(), empty.getCol(), lastMoved);
         //System.out.println(this.board);
 
         return lastMoved;
     }
 
     /* Moves the tile in position (r, c) into the empty space */
-    public void move(int r, int c, int blankR, int blankC) {
+    public Tile[] move(int r, int c, int blankR, int blankC, Tile[] moved) {
         // if (this.moveExists(this.board[r][c].getVal())) {
         //     Tile temp = this.board[r][c];
         // }
@@ -121,7 +124,10 @@ public class PuzzleBoard {
         // of the empty space
         Tile temp = this.board[r][c];
         this.board[r][c] = this.board[blankR][blankC];
+        moved[EMPTY_SPACE] = this.board[r][c];
         this.board[blankR][blankC] = this.board[r][c];
+        moved[LAST_MOVED] = this.board[blankR][blankC];
+        return moved;
     }
 
     /* Checks if a move exists from the given number */
@@ -136,7 +142,7 @@ public class PuzzleBoard {
                     // have to iterate through it, so we lose the efficiency
                     // of checking set containment. There are a max of 4
                     // elements here though, so it shouldn't be that bad
-                    Set<Tile> nbd = this.neighborhood(i, j);
+                    List<Tile> nbd = this.neighborhood(i, j);
                     for (Tile t : nbd) {
                         if (t.isEmptySpace()) {
                             return true;
@@ -152,8 +158,8 @@ public class PuzzleBoard {
     /* Helper function for moveExists, returns the numbers to the left, right,
     above, and below the given (row, column), if they exist.
     */
-    private Set<Tile> neighborhood(int r, int c) {
-        Set<Tile> nbd = new HashSet<Tile>();
+    private List<Tile> neighborhood(int r, int c) {
+        List<Tile> nbd = new ArrayList<Tile>();
         if (r > 0) {
             nbd.add(this.board[r-1][c]);
         }
