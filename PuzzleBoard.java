@@ -95,20 +95,28 @@ public class PuzzleBoard {
         Tile empty = lastMoved[EMPTY_SPACE];
 
         List<Tile> nbd = this.neighborhood(empty.getRow(), empty.getCol());
-        // int choice = rand.nextInt(nbd.size());
-        // Iterator it = nbd.iterator();
-        Tile toMove = new Tile(0, 0, 9);    // Some arbitrary initialization
-        // for (int i = 0; i <= choice; i++) {
-        //     Object toMoveObj = it.next();
-        //     toMove = (Tile) toMoveObj;
-        // }
         Collections.shuffle(nbd);
+        int index = 0;
+        Tile toMove = nbd.get(index);   // Check the first thing
+        if (toMove == lastMoved[LAST_MOVED]) {
+            // The first thing in the shuffled neighborhood was the last tile
+            // you moved. Can't use it, so use the next one.
+            index++;
+            toMove = nbd.get(index);
+            // Note that the neighborhood will always have at least two
+            // elements, so this will never throw an exception
+        }
 
-        // Need a move() method here...
         // System.out.println(toMove);
-        // lastMoved = this.move(toMove.getRow(), toMove.getCol(), 
-        //           empty.getRow(), empty.getCol(), lastMoved);
-        //System.out.println(this.board);
+        System.out.println("toMove: " + toMove + 
+            toMove.getRow() + toMove.getCol());
+        System.out.println("blank: " + empty + 
+            empty.getRow() + empty.getCol());
+        System.out.println("lastMoved: " + lastMoved[LAST_MOVED] + 
+            lastMoved[LAST_MOVED].getRow() + lastMoved[LAST_MOVED].getCol());
+        
+        lastMoved = this.move(toMove.getRow(), toMove.getCol(), 
+                   empty.getRow(), empty.getCol(), lastMoved);
 
         return lastMoved;
     }
