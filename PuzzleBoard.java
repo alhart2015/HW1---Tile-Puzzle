@@ -7,6 +7,7 @@ Alden Hart and Spencer Chadinha
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Random;
+import java.util.Iterator;
 
 public class PuzzleBoard {
 
@@ -62,12 +63,25 @@ public class PuzzleBoard {
         // distribution of random boards
         int randRange = 100;
         int numMoves = rand.nextInt(randRange);
+        // lastMoved[0] = position of the empty space
+        // lastMoved[1] = position of the last Tile moved
+        Tile[] lastMoved = new Tile[2];
+        lastMoved[0] = this.board[0][0];
+        // Pick any tile that can't be moved the first time for this
+        lastMoved[1] = this.board[2][2];
+        for (int i = 0; i < numMoves; i++) {
+            lastMoved = randomMove(lastMoved);
+        }
 
     }
 
-    /* Helper for init(), makes a random move on the board
+    /* Helper for init(), makes a random move on the board. As above,
+    lastMoved[0] = the position of the empty space, and
+    lastMoved[1] = the position of the last Tile moved. We track these
+    so that your move cannot undo your previous move, which prevents
+    the space of likely boards from being too small.
     */
-    private int[][] randomMove(int[][] lastMoves) {
+    private Tile[] randomMove(Tile[] lastMoved) {
         /* Notes:
             - remember where you just moved so you can't do that
             - keep track of where the 0 is so you don't have to loop
@@ -76,10 +90,38 @@ public class PuzzleBoard {
 
         Random rand = new Random();
 
+        Tile empty = lastMoved[0];
+
+        Set<Tile> nbd = this.neighborhood(empty.getRow(), empty.getCol());
+        int choice = rand.nextInt(nbd.size());
+        Iterator it = nbd.iterator();
+        Tile toMove = new Tile(0, 0, 9);
+        for (int i = 0; i <= choice; i++) {
+            Object toMoveObj = it.next();
+            toMove = (Tile) toMoveObj;
+        }
 
         // Need a move() method here...
+        System.out.println(toMove);
+        this.move(toMove.getRow(), toMove.getCol(), 
+                  empty.getRow(), empty.getCol());
+        //System.out.println(this.board);
 
-        return new int[2][2];
+        return lastMoved;
+    }
+
+    /* Moves the tile in position (r, c) into the empty space */
+    public void move(int r, int c, int blankR, int blankC) {
+        // if (this.moveExists(this.board[r][c].getVal())) {
+        //     Tile temp = this.board[r][c];
+        // }
+
+        // Not sure you need to check if the move exists, since you're
+        // only calling the move() method on tiles in the neightborhood
+        // of the empty space
+        Tile temp = this.board[r][c];
+        this.board[r][c] = this.board[blankR][blankC];
+        this.board[blankR][blankC] = this.board[r][c];
     }
 
     /* Checks if a move exists from the given number */
