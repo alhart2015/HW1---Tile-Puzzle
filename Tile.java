@@ -44,11 +44,11 @@ public class Tile {
 
     // Setters
     public void setRow(int move) {
-        this.r += move;
+        this.r = move;
     }
 
     public void setCol(int move) {
-        this.c += move;
+        this.c = move;
     }
 
 }

@@ -9,18 +9,14 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Random;
-import java.util.Iterator;
-import java.util.Collections;
 
-public class PuzzleBoard {
-
-    private static final int EMPTY_SPACE = 0;
-    private static final int LAST_MOVED = 1;
+public class PuzzleBoard implements Comparable<PuzzleBoard> {
 
     private Tile[][] board;
     private int size;
     private int blankRow;
     private int blankCol;
+    private int score;
 
     // if parity + d(blank, goalBlank) is odd, board isn't solvable
 
@@ -34,6 +30,7 @@ public class PuzzleBoard {
         this.size = squareSize;
         this.blankRow = 0;  // Just to initialize them before actually finding
         this.blankCol = 0;  // the empty tile in init()
+        this.score = Integer.MAX_VALUE;
         this.init();
     }
 
@@ -46,6 +43,7 @@ public class PuzzleBoard {
         this.size = squareSize;
         this.blankRow = 0;
         this.blankCol = 0;
+        this.score = Integer.MAX_VALUE;
 
         this.board[0][0] = new Tile(0, 0, a);
         this.board[0][1] = new Tile(0, 1, b);
@@ -57,11 +55,11 @@ public class PuzzleBoard {
         this.board[2][1] = new Tile(2, 1, h);
         this.board[2][2] = new Tile(2, 2, i);
 
-        for (int i = 0; i < this.size; i++) {
-            for (int j = 0; j < this.size; j++) {
-                if (this.board[i][j].getVal() == 0) {
-                    this.blankRow = i;
-                    this.blankCol = j;
+        for (int r = 0; r < this.size; r++) {
+            for (int col = 0; col < this.size; col++) {
+                if (this.board[r][col].getVal() == 0) {
+                    this.blankRow = r;
+                    this.blankCol = col;
                 }
             }
         }
@@ -180,15 +178,32 @@ public class PuzzleBoard {
         return a;
     }
 
-    /* Moves the tile in position (r, c) into the blank space */
-    public void move() {
+    /* Moves the tile in position (r, c) into the blank space.
 
+    @param r the row of the tile to move into the empty space
+    @param c the column of the tile to move into the empty space
+    */
+    public void move(int r, int c) {
+        // Update the tiles
+        // int rowDiff = this.blankRow - r;
+        // int colDiff = this.blankCol - c;
+        this.board[r][c].setRow(this.blankRow);
+        this.board[r][c].setCol(this.blankCol);
+        this.board[blankRow][blankRow].setRow(r);
+        this.board[blankRow][blankCol].setCol(c);
+
+        // Make the move
+        Tile temp = this.board[r][c];
+        this.board[r][c] = this.board[blankRow][blankCol];
+        this.board[blankRow][blankCol] = temp;
+        this.blankRow = r;
+        this.blankCol = c;
     }
 
     /* Helper function for moveExists, returns the numbers to the left, right,
     above, and below the given (row, column), if they exist.
     */
-    private List<Tile> neighborhood(int r, int c) {
+    public List<Tile> neighborhood(int r, int c) {
         List<Tile> nbd = new ArrayList<Tile>();
         if (r > 0) {
             nbd.add(this.board[r-1][c]);
@@ -251,10 +266,6 @@ public class PuzzleBoard {
     /* Heuristic function following the h2 described in the text on page 103.
     Computes the Manhattan between each tile and its position in the goal
     state.
-
-    THIS MIGHT HAVE A BUG, BUT IT MIGHT NOT BECAUSE IT DOESN'T CONSIDER THE
-    DISTANCE OF THE EMPTY SPACE FROM ITS GOAL POSITION. CHECK IN THE TEXTBOOK
-    IF THAT SHOULD BE PART OF IT BEFORE YOU WASTE YOUR TIME FIXING THIS
     */
     public int h2() {
 
@@ -277,6 +288,66 @@ public class PuzzleBoard {
         return totalDistance;
     }
 
+    /* Solves the board using A* search.
+
+    @return the number of steps needed to find the solution
+    */
+    // public int solve() {
+        /* Needs:
+            - Heuristic function (check)
+            - g(n) - cost to reach the node from the start 
+                - This should just go up by 1 every time you make a move, right?
+        */
+    //    return this.aStar(0, Integer.MAX_VALUE);
+    // }
+
+    /* Private helper method for solve(). Implements A* and tracks the depth
+    of the search.
+
+    @param numTries the current depth of your search
+    @param fLimit the f-cost limit
+
+    @return the number of states it took to find a solution
+    */
+    // private int aStar(int numTries, int fLimit) {
+
+    //     // Base case
+    //     if (this.isSolved()) {
+    //         return numTries;
+    //     }
+
+    //     List<Tile> successors = new ArrayList<Tile>();
+    //     List<Tile> possibleMoves = this.neighborhood(this.blankRow, this.blankCol);
+    //     for (Tile t : possibleMoves) {
+    //         // Make the move
+    //         this.move(t.getRow(), t.getCol());
+    //         // Add the board to successors...
+    //         // This should be in PuzzleSolver, because successors needs to be
+    //         // a List<PuzzleBoard> not a List<Tile>
+    //     }
+    // }
+
+    /* Helper for A*. Checks if the current board is a solved board.
+
+    @return true if the board is in its goal state, false otherwise
+    */
+    public boolean isSolved() {
+        for (int i = 0; i < this.size; i++) {
+            for (int j = 0; j < this.size; j++) {
+                int val = this.board[i][j].getVal();
+                if (val != i*this.size + j) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /* @Override */
+    public int compareTo(PuzzleBoard b) {
+        return this.score - b.getScore();
+    }
+
     /* Public getter for the board */
     public Tile[][] getBoard() {
         return this.board;
@@ -295,6 +366,16 @@ public class PuzzleBoard {
     /* Public getter for the column of the empty space */
     public int getBlankCol() {
         return this.blankCol;
+    }
+
+    /* Public getter for the score of the board */
+    public int getScore() {
+        return this.score;
+    }
+
+    /* Public setter for the score of the board */
+    public void setScore(int s) {
+        this.score = s;
     }
 
 }
