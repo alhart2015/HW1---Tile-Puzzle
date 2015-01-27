@@ -8,15 +8,15 @@ public class PuzzleSolver {
 
     public static void main(String[] args) {
         PuzzleBoard x = new PuzzleBoard(3);
-        System.out.println(x);
+        // System.out.println(x);
 
         // PuzzleBoard x = new PuzzleBoard(3, 7, 2, 4,
         //                                 5, 0, 6,
         //                                 8, 3, 1);
-        // System.out.println(x);
+        System.out.println(x);
 
-        // System.out.println(x.h1());
-        // System.out.println(x.h2());
+        System.out.println(x.h1());
+        System.out.println(x.h2());
         // System.out.println(x.moveExists(6));
 
     }
