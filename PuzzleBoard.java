@@ -19,6 +19,8 @@ public class PuzzleBoard {
 
     private Tile[][] board;
     private int size;
+    private int blankRow;
+    private int blankCol;
 
     // if parity + d(blank, goalBlank) is odd, board isn't solvable
 
@@ -30,8 +32,8 @@ public class PuzzleBoard {
     public PuzzleBoard(int squareSize) {
         this.board = new Tile[squareSize][squareSize];
         this.size = squareSize;
-        // this.blankRow = 0;
-        // this.blankCol = 0;
+        this.blankRow = 0;  // Just to initialize them before actually finding
+        this.blankCol = 0;  // the empty tile in init()
         this.init();
     }
 
@@ -39,8 +41,12 @@ public class PuzzleBoard {
     public PuzzleBoard(int squareSize, int a, int b, int c,
                         int d, int e, int f,
                         int g, int h, int i) {
+
         this.board = new Tile[squareSize][squareSize];
         this.size = squareSize;
+        this.blankRow = 0;
+        this.blankCol = 0;
+
         this.board[0][0] = new Tile(0, 0, a);
         this.board[0][1] = new Tile(0, 1, b);
         this.board[0][2] = new Tile(0, 2, c);
@@ -50,6 +56,15 @@ public class PuzzleBoard {
         this.board[2][0] = new Tile(2, 0, g);
         this.board[2][1] = new Tile(2, 1, h);
         this.board[2][2] = new Tile(2, 2, i);
+
+        for (int i = 0; i < this.size; i++) {
+            for (int j = 0; j < this.size; j++) {
+                if (this.board[i][j].getVal() == 0) {
+                    this.blankRow = i;
+                    this.blankCol = j;
+                }
+            }
+        }
     }
 
     /* Creates a random solvable board using the parity sign check.
@@ -59,6 +74,15 @@ public class PuzzleBoard {
         while (!valid) {
             this.makeRandomBoard();
             valid = this.isValid();
+        }
+
+        for (int i = 0; i < this.size; i++) {
+            for (int j = 0; j < this.size; j++) {
+                if (this.board[i][j].getVal() == 0) {
+                    this.blankRow = i;
+                    this.blankCol = j;
+                }
+            }
         }
     }
 
@@ -227,6 +251,10 @@ public class PuzzleBoard {
     /* Heuristic function following the h2 described in the text on page 103.
     Computes the Manhattan between each tile and its position in the goal
     state.
+
+    THIS MIGHT HAVE A BUG, BUT IT MIGHT NOT BECAUSE IT DOESN'T CONSIDER THE
+    DISTANCE OF THE EMPTY SPACE FROM ITS GOAL POSITION. CHECK IN THE TEXTBOOK
+    IF THAT SHOULD BE PART OF IT BEFORE YOU WASTE YOUR TIME FIXING THIS
     */
     public int h2() {
 
@@ -257,6 +285,16 @@ public class PuzzleBoard {
     /* Public getter for the size */
     public int getSize() {
         return this.size;
+    }
+
+    /* Public getter for the row of the empty space */
+    public int getBlankRow() {
+        return this.blankRow;
+    }
+
+    /* Public getter for the column of the empty space */
+    public int getBlankCol() {
+        return this.blankCol;
     }
 
 }
