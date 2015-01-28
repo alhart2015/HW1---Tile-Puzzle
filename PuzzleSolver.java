@@ -9,6 +9,7 @@ import java.util.Iterator;
 // import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;
+// import java.util.TreeSet;
 import java.util.Queue;
 import java.util.PriorityQueue;
 import java.lang.RuntimeException;
@@ -25,15 +26,23 @@ public class PuzzleSolver {
         PuzzleBoard x = new PuzzleBoard(3, 7, 2, 4,
                                         5, 0, 6,
                                         8, 3, 1);
+        // PuzzleBoard y = new PuzzleBoard(3, 7, 2, 4,
+        //                                 5, 0, 6,
+        //                                 8, 3, 1);
+        // Set<PuzzleBoard> s = new HashSet<PuzzleBoard>();
+        // System.out.println(x.hashCode());
+        // System.out.println(y.hashCode());
+        // System.out.println(x.equals(y));
+        // s.add(x);
+        // System.out.println(s.contains(y));
         // System.out.println(x);
-        // System.out.println(x.getBlankRow() + " " + x.getBlankCol());
-        // System.out.println(x.neighborhood(x.getBlankRow(), x.getBlankCol()));
+
 
         // x.move(2, 1);
         // System.out.println(x);
         // System.out.println(x.getBlankRow() + " " + x.getBlankCol());
         // System.out.println(x.neighborhood(x.getBlankRow(), x.getBlankCol()));
-        // PuzzleBoard x = new PuzzleBoard(3, 1, 0, 2,
+        // PuzzleBoard x = new PuzzleBoard(3, 1, 2, 0,
         //                                 3, 4, 5,
         //                                 6, 7, 8);
         // System.out.println(x);
@@ -50,7 +59,7 @@ public class PuzzleSolver {
             hFunc = Integer.parseInt(args[0]);
         } catch (ArrayIndexOutOfBoundsException e) {
             System.out.println("Invalid choice of heuristic, defaulting");
-            System.out.println("to h1, misplaced tiles heuristic.");
+            System.out.println("to h1: misplaced tiles heuristic.");
         }
         int depth = solve(x, hFunc);
         // System.out.println(x);
@@ -61,30 +70,6 @@ public class PuzzleSolver {
         // x.move(1, 0);
         // System.out.println(x);
         // System.out.println(y);
-
-        // x.move(1, 0);
-        // System.out.println(x);
-        // x.move(0, 0);
-        // System.out.println(x);
-        // try {
-        //     System.out.println(args[0]);
-        // } catch (ArrayIndexOutOfBoundsException e) {
-        //     System.out.println("Invalid choice of heuristic, defaulting");
-        //     System.out.println("to h1, misplaced tiles heuristic.");
-        // }
-        // System.out.println(x.getBoard()[1][0]);
-        // System.out.println(x.getBoard()[1][0].getRow());
-        // System.out.println(x.getBoard()[1][0].getCol());
-        // x.move(1, 0);
-        // System.out.println(x);
-        // System.out.println(x.getBoard()[1][0]);
-        // System.out.println(x.getBoard()[1][0].getRow());
-        // System.out.println(x.getBoard()[1][0].getCol());
-        // System.out.println(x.getBlankRow());
-        // System.out.println(x.getBlankCol());
-        // System.out.println(x.h1());
-        // System.out.println(x.h2());
-        // System.out.println(x.moveExists(6));
 
     }
 
@@ -154,14 +139,14 @@ public class PuzzleSolver {
                 } else {
                     child.setScore(child.h1() + pathCost);
                 }
-                System.out.println(child.getScore());
+                // System.out.println(child.getScore());
+                // System.out.println(explored.contains(child));
+                // System.out.println(frontier.contains(child));
                 if (!explored.contains(child) && !frontier.contains(child)) {
                     frontier.add(child);
                 } else if (frontier.contains(child)) {
                     // If it's in frontier, check if the board in frontier has
-                    // a higher cost than this one. This should never happen,
-                    // right? Because it'll have the same heuristic score and
-                    // a lower path cost...
+                    // a higher cost than this one.
                     int childScore = child.getScore();
                     int frontierScore = 0;
                     PuzzleBoard next = null;
@@ -169,23 +154,40 @@ public class PuzzleSolver {
                         next = frontier.poll();
                         frontierScore = next.getScore();
                     } else {
+                        System.out.println("HERE");
                         // It's not the first thing in the queue so you have
                         // to iterate through the whole thing
-                        Iterator it = frontier.iterator();
-                        next = frontier.poll();
-                        while (next != child) {
-                            // Don't need to check for it.hasNext() because
-                            // you already know it's in the queue, so it'll
-                            // find it eventually
-                            Object n = it.next();
-                            next = (PuzzleBoard) n;
+                        // Iterator it = frontier.iterator();
+                        // Set<PuzzleBoard> enqueued = new HashSet<PuzzleBoard>();
+                        // next = frontier.poll();
+                        // while (next != child) {
+                        //     // Don't need to check for it.hasNext() because
+                        //     // you already know it's in the queue, so it'll
+                        //     // find it eventually
+                        //     enqueued.add(next);
+                        //     next = frontier.poll();
+                        //     // Object n = it.next();
+                        //     // next = (PuzzleBoard) n;
+                        // }
+                        // for (PuzzleBoard b : enqueued) {
+                        //     frontier.add(b);
+                        // }
+                        // int frontierSize = frontier.size();
+                        int i = 1;
+                        Object[] frontierArray = frontier.toArray();
+                        next = (PuzzleBoard) frontierArray[0];
+                        // System.out.println(next);
+                        while (!next.equals(child)) {
+                            next = (PuzzleBoard) frontierArray[i];
+                            i++;
                         }
                         frontierScore = next.getScore();
                     }
                     if (childScore < frontierScore) {
+                        frontier.remove(next);
                         frontier.add(child);
-                    } else {
-                        frontier.add(next);
+                    // } else {
+                    //     frontier.add(next);
                     }
                 }
             }

@@ -190,8 +190,8 @@ public class PuzzleBoard implements Comparable<PuzzleBoard> {
         // valid += c - this.blankCol;
         // if (Math.abs(valid) == 1) {
 
-        System.out.println("Blank: " + this.blankRow + " " + this.blankCol);
-        System.out.println("Tile: " + r + " " + c);
+        // System.out.println("Blank: " + this.blankRow + " " + this.blankCol);
+        // System.out.println("Tile: " + r + " " + c);
 
         // Update the tiles
         this.board[r][c].setRow(this.blankRow);
@@ -225,9 +225,9 @@ public class PuzzleBoard implements Comparable<PuzzleBoard> {
         if (c < this.size-1) {
             nbd.add(this.board[r][c+1]);
         }
-        for (Tile t : nbd) {
-            System.out.println(t.getVal() + " " + t.getRow() + " " + t.getCol());
-        }
+        // for (Tile t : nbd) {
+        //     System.out.println(t.getVal() + " " + t.getRow() + " " + t.getCol());
+        // }
         return nbd;
     }
 
@@ -333,12 +333,12 @@ public class PuzzleBoard implements Comparable<PuzzleBoard> {
         return copy;
     }
 
-    /* @Override */
+    @Override
     public int compareTo(PuzzleBoard b) {
         return this.score - b.getScore();
     }
 
-    /* @Override */
+    @Override
     public int hashCode() {
         int hash = 0;
         for (int i = 0; i < this.size; i++) {
@@ -349,9 +349,12 @@ public class PuzzleBoard implements Comparable<PuzzleBoard> {
         return hash;
     }
 
-    /* @Override */
-    public boolean equals(PuzzleBoard other) {
-        return this.hashCode() == other.hashCode();
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof PuzzleBoard) {
+            return this.hashCode() == other.hashCode();
+        }
+        return false;   
     }
 
     /* Public getter for the board */
