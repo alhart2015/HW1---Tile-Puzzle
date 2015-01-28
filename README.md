@@ -13,3 +13,5 @@ are defined as follows:
 
     2 chooses the Manhattan distance heuristic, which sums the Manhattan distance
     of each tile on the board from its position in a solved board
+
+In the case of absent or invalid input, the misplaced tiles heuristic is used.

@@ -185,8 +185,6 @@ public class PuzzleBoard implements Comparable<PuzzleBoard> {
     */
     public void move(int r, int c) {
         // Update the tiles
-        // int rowDiff = this.blankRow - r;
-        // int colDiff = this.blankCol - c;
         this.board[r][c].setRow(this.blankRow);
         this.board[r][c].setCol(this.blankCol);
         this.board[blankRow][blankRow].setRow(r);
@@ -288,45 +286,6 @@ public class PuzzleBoard implements Comparable<PuzzleBoard> {
         return totalDistance;
     }
 
-    /* Solves the board using A* search.
-
-    @return the number of steps needed to find the solution
-    */
-    // public int solve() {
-        /* Needs:
-            - Heuristic function (check)
-            - g(n) - cost to reach the node from the start 
-                - This should just go up by 1 every time you make a move, right?
-        */
-    //    return this.aStar(0, Integer.MAX_VALUE);
-    // }
-
-    /* Private helper method for solve(). Implements A* and tracks the depth
-    of the search.
-
-    @param numTries the current depth of your search
-    @param fLimit the f-cost limit
-
-    @return the number of states it took to find a solution
-    */
-    // private int aStar(int numTries, int fLimit) {
-
-    //     // Base case
-    //     if (this.isSolved()) {
-    //         return numTries;
-    //     }
-
-    //     List<Tile> successors = new ArrayList<Tile>();
-    //     List<Tile> possibleMoves = this.neighborhood(this.blankRow, this.blankCol);
-    //     for (Tile t : possibleMoves) {
-    //         // Make the move
-    //         this.move(t.getRow(), t.getCol());
-    //         // Add the board to successors...
-    //         // This should be in PuzzleSolver, because successors needs to be
-    //         // a List<PuzzleBoard> not a List<Tile>
-    //     }
-    // }
-
     /* Helper for A*. Checks if the current board is a solved board.
 
     @return true if the board is in its goal state, false otherwise
@@ -343,9 +302,35 @@ public class PuzzleBoard implements Comparable<PuzzleBoard> {
         return true;
     }
 
+    public PuzzleBoard copy() {
+        PuzzleBoard copy = new PuzzleBoard(this.size);
+        for (int i = 0; i < this.size; i++) {
+            for (int j = 0; j < this.size; j++) {
+                copy.board[i][j] = this.board[i][j];
+            }
+        }    
+        return copy;
+    }
+
     /* @Override */
     public int compareTo(PuzzleBoard b) {
         return this.score - b.getScore();
+    }
+
+    /* @Override */
+    public int hashCode() {
+        int hash = 0;
+        for (int i = 0; i < this.size; i++) {
+            for (int j = 0; j < this.size; j++) {
+                hash += this.board[i][j].getVal() * ((i*this.size + j) + 37);
+            }
+        }
+        return hash;
+    }
+
+    /* @Override */
+    public boolean equals(PuzzleBoard other) {
+        return this.hashCode() == other.hashCode();
     }
 
     /* Public getter for the board */
