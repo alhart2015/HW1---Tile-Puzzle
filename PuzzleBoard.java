@@ -309,6 +309,9 @@ public class PuzzleBoard implements Comparable<PuzzleBoard> {
                 copy.board[i][j] = this.board[i][j];
             }
         }    
+        copy.blankRow = this.blankRow;
+        copy.blankCol = this.blankCol;
+        copy.score = this.score;
         return copy;
     }
 

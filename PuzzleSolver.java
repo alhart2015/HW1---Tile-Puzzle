@@ -136,12 +136,14 @@ public class PuzzleSolver {
             for (Tile t : possibleMoves) {
                 PuzzleBoard child = node.copy();
                 child.move(t.getRow(), t.getCol());
-                // System.out.println(child);
+                System.out.println("Possible move");
+                System.out.println(child);
                 if (hFunc == 2) {
                     child.setScore(child.h2() + pathCost);
                 } else {
                     child.setScore(child.h1() + pathCost);
                 }
+                System.out.println(child.getScore());
                 if (!explored.contains(child) && !frontier.contains(child)) {
                     frontier.add(child);
                 } else if (frontier.contains(child)) {
