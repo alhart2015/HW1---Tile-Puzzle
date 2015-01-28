@@ -16,13 +16,15 @@ import java.lang.ArrayIndexOutOfBoundsException;
 
 public class PuzzleSolver {
 
+    private static final int DEFAULT_HFUNC = 1;
+
     public static void main(String[] args) {
         // PuzzleBoard x = new PuzzleBoard(3);
         // System.out.println(x);
 
-        // PuzzleBoard x = new PuzzleBoard(3, 7, 2, 4,
-        //                                 5, 0, 6,
-        //                                 8, 3, 1);
+        PuzzleBoard x = new PuzzleBoard(3, 7, 2, 4,
+                                        5, 0, 6,
+                                        8, 3, 1);
         // System.out.println(x);
         // System.out.println(x.getBlankRow() + " " + x.getBlankCol());
         // System.out.println(x.neighborhood(x.getBlankRow(), x.getBlankCol()));
@@ -31,12 +33,19 @@ public class PuzzleSolver {
         // System.out.println(x);
         // System.out.println(x.getBlankRow() + " " + x.getBlankCol());
         // System.out.println(x.neighborhood(x.getBlankRow(), x.getBlankCol()));
-        PuzzleBoard x = new PuzzleBoard(3, 1, 0, 2,
-                                        3, 4, 5,
-                                        6, 7, 8);
-        System.out.println(x);
+        // PuzzleBoard x = new PuzzleBoard(3, 1, 0, 2,
+        //                                 3, 4, 5,
+        //                                 6, 7, 8);
+        // System.out.println(x);
+        // x.move(1, 0);
+        // System.out.println(x);
+        // x.move(2, 0);
+        // System.out.println(x);
+        // System.out.println(x.neighborhood(2, 0));
+        // x.move(2, 1);
+        // System.out.println(x);
 
-        int hFunc = 1;
+        int hFunc = DEFAULT_HFUNC;
         try {
             hFunc = Integer.parseInt(args[0]);
         } catch (ArrayIndexOutOfBoundsException e) {
@@ -121,8 +130,9 @@ public class PuzzleSolver {
         while (true) {
             if (frontier.isEmpty()) {
                 // This should never ever happen ever
-                throw new RuntimeException("Failed to solve board!!!");
+                throw new RuntimeException("Failed to solve board.");
             }
+            // Choose the lowest-cost node in frontier
             node = frontier.poll();
             if (node.isSolved()) {
                 System.out.println(node);
@@ -131,6 +141,7 @@ public class PuzzleSolver {
             explored.add(node);
             List<Tile> possibleMoves = node.neighborhood(node.getBlankRow(),
                                                          node.getBlankCol());
+            System.out.println("Node:");
             System.out.println(node);
             System.out.println(possibleMoves);
             for (Tile t : possibleMoves) {
@@ -147,6 +158,10 @@ public class PuzzleSolver {
                 if (!explored.contains(child) && !frontier.contains(child)) {
                     frontier.add(child);
                 } else if (frontier.contains(child)) {
+                    // If it's in frontier, check if the board in frontier has
+                    // a higher cost than this one. This should never happen,
+                    // right? Because it'll have the same heuristic score and
+                    // a lower path cost...
                     int childScore = child.getScore();
                     int frontierScore = 0;
                     PuzzleBoard next = null;
@@ -155,7 +170,7 @@ public class PuzzleSolver {
                         frontierScore = next.getScore();
                     } else {
                         // It's not the first thing in the queue so you have
-                        // to iterate through the whole damn thing
+                        // to iterate through the whole thing
                         Iterator it = frontier.iterator();
                         next = frontier.poll();
                         while (next != child) {

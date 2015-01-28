@@ -184,10 +184,19 @@ public class PuzzleBoard implements Comparable<PuzzleBoard> {
     @param c the column of the tile to move into the empty space
     */
     public void move(int r, int c) {
+        // Is the move valid?
+        // int valid = 0;
+        // valid += r - this.blankRow;
+        // valid += c - this.blankCol;
+        // if (Math.abs(valid) == 1) {
+
+        System.out.println("Blank: " + this.blankRow + " " + this.blankCol);
+        System.out.println("Tile: " + r + " " + c);
+
         // Update the tiles
         this.board[r][c].setRow(this.blankRow);
         this.board[r][c].setCol(this.blankCol);
-        this.board[blankRow][blankRow].setRow(r);
+        this.board[blankRow][blankCol].setRow(r);
         this.board[blankRow][blankCol].setCol(c);
 
         // Make the move
@@ -196,6 +205,7 @@ public class PuzzleBoard implements Comparable<PuzzleBoard> {
         this.board[blankRow][blankCol] = temp;
         this.blankRow = r;
         this.blankCol = c;
+        // }
     }
 
     /* Helper function for moveExists, returns the numbers to the left, right,
@@ -214,6 +224,9 @@ public class PuzzleBoard implements Comparable<PuzzleBoard> {
         }
         if (c < this.size-1) {
             nbd.add(this.board[r][c+1]);
+        }
+        for (Tile t : nbd) {
+            System.out.println(t.getVal() + " " + t.getRow() + " " + t.getCol());
         }
         return nbd;
     }
@@ -306,9 +319,14 @@ public class PuzzleBoard implements Comparable<PuzzleBoard> {
         PuzzleBoard copy = new PuzzleBoard(this.size);
         for (int i = 0; i < this.size; i++) {
             for (int j = 0; j < this.size; j++) {
-                copy.board[i][j] = this.board[i][j];
+                int val = this.board[i][j].getVal();
+                copy.board[i][j] = new Tile(i, j, val);
+                // copy.board[i][j] = this.board[i][j];
+                // copy.board[i][j].setRow(i);
+                // copy.board[i][j].setCol(j);
             }
-        }    
+        }
+        copy.size = this.size;    
         copy.blankRow = this.blankRow;
         copy.blankCol = this.blankCol;
         copy.score = this.score;
