@@ -36,6 +36,22 @@ public class PuzzleBoard implements Comparable<PuzzleBoard> {
         this.init();
     }
 
+    /* Initializes the state of the board by making a user-defined number
+    of random moves
+
+    @param squareSize the size of the board, typically 3x3
+    @param numMoves the number of random moves to be made
+    */
+    public PuzzleBoard(int squareSize, int numMoves) {
+        this.board = new Tile[squareSize][squareSize];
+        this.size = squareSize;
+        this.blankRow = 0;  // Just to initialize them before actually finding
+        this.blankCol = 0;  // the empty tile in init()
+        this.score = Integer.MAX_VALUE;
+        this.depth = 0;
+        this.setDepthInit(numMoves);
+    }
+
     /* Constructor for testing, so you can input the start state */
     public PuzzleBoard(int squareSize, int a, int b, int c,
                         int d, int e, int f,
@@ -85,6 +101,23 @@ public class PuzzleBoard implements Comparable<PuzzleBoard> {
                 }
             }
         }
+    }
+
+    /* Fills a blank board with a user-defined number of random moves
+
+    @param numMoves the number of moves to be made
+    */
+    private void setDepthInit(int numMoves) {
+
+        // Fill the board in order
+        for (int i = 0; i < this.size; i++) {
+            for (int j = 0; j < this.size; j++) {
+                this.board[i][j] = new Tile(i, j, i*this.size + j);
+            }
+        }
+
+        // Make a user-defined number of random moves
+        Random rand = new Random();
     }
 
     /* Checks if the current board is valid.
@@ -187,14 +220,6 @@ public class PuzzleBoard implements Comparable<PuzzleBoard> {
     @param c the column of the tile to move into the empty space
     */
     public void move(int r, int c) {
-        // Is the move valid?
-        // int valid = 0;
-        // valid += r - this.blankRow;
-        // valid += c - this.blankCol;
-        // if (Math.abs(valid) == 1) {
-
-        // System.out.println("Blank: " + this.blankRow + " " + this.blankCol);
-        // System.out.println("Tile: " + r + " " + c);
 
         // Update the tiles
         this.board[r][c].setRow(this.blankRow);
@@ -208,7 +233,6 @@ public class PuzzleBoard implements Comparable<PuzzleBoard> {
         this.board[blankRow][blankCol] = temp;
         this.blankRow = r;
         this.blankCol = c;
-        // }
     }
 
     /* Helper function for moveExists, returns the numbers to the left, right,
@@ -324,9 +348,6 @@ public class PuzzleBoard implements Comparable<PuzzleBoard> {
             for (int j = 0; j < this.size; j++) {
                 int val = this.board[i][j].getVal();
                 copy.board[i][j] = new Tile(i, j, val);
-                // copy.board[i][j] = this.board[i][j];
-                // copy.board[i][j].setRow(i);
-                // copy.board[i][j].setCol(j);
             }
         }
         copy.size = this.size;    
@@ -341,16 +362,6 @@ public class PuzzleBoard implements Comparable<PuzzleBoard> {
         return this.score - b.getScore();
     }
 
-    // @Override
-    // public int hashCode() {
-    //     int hash = 0;
-    //     for (int i = 0; i < this.size; i++) {
-    //         for (int j = 0; j < this.size; j++) {
-    //             hash += this.board[i][j].getVal() * ((i*this.size + j) + 37);
-    //         }
-    //     }
-    //     return hash;
-    // }
     @Override
     public int hashCode() {
         StringBuilder sb = new StringBuilder();
