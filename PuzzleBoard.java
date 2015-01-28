@@ -17,6 +17,7 @@ public class PuzzleBoard implements Comparable<PuzzleBoard> {
     private int blankRow;
     private int blankCol;
     private int score;
+    private int depth;
 
     // if parity + d(blank, goalBlank) is odd, board isn't solvable
 
@@ -31,6 +32,7 @@ public class PuzzleBoard implements Comparable<PuzzleBoard> {
         this.blankRow = 0;  // Just to initialize them before actually finding
         this.blankCol = 0;  // the empty tile in init()
         this.score = Integer.MAX_VALUE;
+        this.depth = 0;
         this.init();
     }
 
@@ -44,6 +46,7 @@ public class PuzzleBoard implements Comparable<PuzzleBoard> {
         this.blankRow = 0;
         this.blankCol = 0;
         this.score = Integer.MAX_VALUE;
+        this.depth = 0;
 
         this.board[0][0] = new Tile(0, 0, a);
         this.board[0][1] = new Tile(0, 1, b);
@@ -338,15 +341,30 @@ public class PuzzleBoard implements Comparable<PuzzleBoard> {
         return this.score - b.getScore();
     }
 
+    // @Override
+    // public int hashCode() {
+    //     int hash = 0;
+    //     for (int i = 0; i < this.size; i++) {
+    //         for (int j = 0; j < this.size; j++) {
+    //             hash += this.board[i][j].getVal() * ((i*this.size + j) + 37);
+    //         }
+    //     }
+    //     return hash;
+    // }
     @Override
     public int hashCode() {
-        int hash = 0;
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < this.size; i++) {
             for (int j = 0; j < this.size; j++) {
-                hash += this.board[i][j].getVal() * ((i*this.size + j) + 37);
+                if (this.board[i][j].getVal() == 0) {
+                    sb.append("9");
+                } else {
+                    sb.append(Integer.toString(this.board[i][j].getVal()));
+                }
             }
         }
-        return hash;
+        String out = sb.toString();
+        return Integer.parseInt(out);
     }
 
     @Override
@@ -382,9 +400,19 @@ public class PuzzleBoard implements Comparable<PuzzleBoard> {
         return this.score;
     }
 
+    /* Public getter for the depth of the board */
+    public int getDepth() {
+        return this.depth;
+    }
+
     /* Public setter for the score of the board */
     public void setScore(int s) {
         this.score = s;
+    }
+
+    /* Public setter for the depth of the board */
+    public void setDepth(int d) {
+        this.depth = d;
     }
 
 }

@@ -101,7 +101,7 @@ public class PuzzleSolver {
     */
     private static int aStar(PuzzleBoard board, int hFunc) {
 
-        int pathCost = 0;
+        // int pathCost = 0;
         Queue<PuzzleBoard> frontier = new PriorityQueue<PuzzleBoard>();
         Set<PuzzleBoard> explored = new HashSet<PuzzleBoard>();
         PuzzleBoard node = board;
@@ -121,25 +121,26 @@ public class PuzzleSolver {
             node = frontier.poll();
             if (node.isSolved()) {
                 System.out.println(node);
-                return pathCost;
+                return node.getDepth();
             }
             explored.add(node);
             List<Tile> possibleMoves = node.neighborhood(node.getBlankRow(),
                                                          node.getBlankCol());
-            System.out.println("Node:");
-            System.out.println(node);
-            System.out.println(possibleMoves);
+            // System.out.println("Node:");
+            // System.out.println(node);
+            // System.out.println(possibleMoves);
             for (Tile t : possibleMoves) {
                 PuzzleBoard child = node.copy();
+                child.setDepth(node.getDepth() + 1);
                 child.move(t.getRow(), t.getCol());
-                System.out.println("Possible move");
-                System.out.println(child);
+                // System.out.println("Possible move");
+                // System.out.println(child);
                 if (hFunc == 2) {
-                    child.setScore(child.h2() + pathCost);
+                    child.setScore(child.h2() + child.getDepth());
                 } else {
-                    child.setScore(child.h1() + pathCost);
+                    child.setScore(child.h1() + child.getDepth());
                 }
-                // System.out.println(child.getScore());
+                // System.out.println(child.getScore() + " " + child.getDepth() + " " + child.h2());
                 // System.out.println(explored.contains(child));
                 // System.out.println(frontier.contains(child));
                 if (!explored.contains(child) && !frontier.contains(child)) {
@@ -154,7 +155,7 @@ public class PuzzleSolver {
                         next = frontier.poll();
                         frontierScore = next.getScore();
                     } else {
-                        System.out.println("HERE");
+                        // System.out.println("HERE");
                         // It's not the first thing in the queue so you have
                         // to iterate through the whole thing
                         // Iterator it = frontier.iterator();
@@ -187,11 +188,14 @@ public class PuzzleSolver {
                         frontier.remove(next);
                         frontier.add(child);
                     // } else {
-                    //     frontier.add(next);
+                    //     if (!frontier.contains(next)) {
+                    //         System.out.println("aiuhfi");
+                    //         frontier.add(next);   
+                    //     }
                     }
                 }
             }
-            pathCost++;
+            // pathCost++;
         }
     }
 
