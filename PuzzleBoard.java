@@ -118,6 +118,20 @@ public class PuzzleBoard implements Comparable<PuzzleBoard> {
 
         // Make a user-defined number of random moves
         Random rand = new Random();
+        Set<PuzzleBoard> seen = new HashSet<PuzzleBoard>();
+        seen.add(this);
+        int depth = 0;
+        while (depth < numMoves) {
+            List<Tile> nbd = this.neighborhood(this.blankRow, this.blankCol);
+            int choice = rand.nextInt(nbd.size());
+            this.move(nbd.get(choice).getRow(), nbd.get(choice).getCol());
+            if (seen.contains(this)) {
+                this.move(nbd.get(choice).getRow(), nbd.get(choice).getCol());
+            } else {
+                seen.add(this);
+                depth++;
+            }
+        }
     }
 
     /* Checks if the current board is valid.

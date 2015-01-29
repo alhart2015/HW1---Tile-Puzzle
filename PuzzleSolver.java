@@ -5,7 +5,8 @@ Alden Hart and Spencer Chadinha
 */
 
 import java.util.List;
-import java.util.Iterator;
+// import java.util.ArrayList;
+// import java.util.Iterator;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Queue;
@@ -21,9 +22,9 @@ public class PuzzleSolver {
         // PuzzleBoard x = new PuzzleBoard(3);
         // System.out.println(x);
 
-        PuzzleBoard x = new PuzzleBoard(3, 7, 2, 4,
-                                        5, 0, 6,
-                                        8, 3, 1);
+        // PuzzleBoard x = new PuzzleBoard(3, 7, 2, 4,
+        //                                 5, 0, 6,
+        //                                 8, 3, 1);
         // PuzzleBoard y = new PuzzleBoard(3, 7, 2, 4,
         //                                 5, 0, 6,
         //                                 8, 3, 1);
@@ -31,19 +32,25 @@ public class PuzzleSolver {
         // PuzzleBoard x = new PuzzleBoard(3, 1, 2, 0,
         //                                 3, 4, 5,
         //                                 6, 7, 8);
-        System.out.println(x);
+        // PuzzleBoard x = new PuzzleBoard(3, 12);
+        // System.out.println(x);
 
-        int hFunc = DEFAULT_HFUNC;
-        try {
-            hFunc = Integer.parseInt(args[0]);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            System.out.println("Invalid choice of heuristic, defaulting");
-            System.out.println("to h1: misplaced tiles heuristic.");
-        }
-        int[] results = solve(x, hFunc);
-        int depth = results[0];
-        int expandedNodes = results[1];
-        System.out.println("Depth: " + depth + " b* " + expandedNodes);
+        // int hFunc = DEFAULT_HFUNC;
+        // try {
+        //     hFunc = Integer.parseInt(args[0]);
+        //     if (hFunc != 1 && hFunc != 2) {
+        //         System.out.println("Invalid choice of heuristic, defaulting");
+        //         System.out.println("to h1: misplaced tiles heuristic.");
+        //     }
+        // } catch (ArrayIndexOutOfBoundsException e) {
+        //     System.out.println("Invalid choice of heuristic, defaulting");
+        //     System.out.println("to h1: misplaced tiles heuristic.");
+        // }
+        // int[] results = solve(x, hFunc);
+        // int depth = results[0];
+        // int expandedNodes = results[1];
+        // System.out.println("Depth: " + depth + " b* " + expandedNodes);
+        runTest();
 
     }
 
@@ -92,7 +99,7 @@ public class PuzzleSolver {
             // Choose the lowest-cost node in frontier
             node = frontier.poll();
             if (node.isSolved()) {
-                System.out.println(node);
+                //System.out.println(node);
                 int[] out = new int[2];
                 out[0] = node.getDepth();
                 out[1] = expandedNodes;
@@ -139,8 +146,69 @@ public class PuzzleSolver {
                         frontier.add(child);
                     }
                 }
+                expandedNodes++;
             }
-            expandedNodes++;
+        }
+    }
+
+    public static void runTest() {
+
+        int[] h1depths = new int[12];
+        int[] h1branch = new int[12];
+        int[] h2depths = new int[12];
+        int[] h2branch = new int[12];
+
+        int[] h1depthAvg = new int[12];
+        int[] h1branchAvg = new int[12];
+        int[] h2depthAvg = new int[12];
+        int[] h2branchAvg = new int[12];
+
+        System.out.println("d\th1 b*\th2 b*");
+
+        for (int i = 1; i <= 12; i++) {
+            int depth = 2*i;
+            int h1d = 0;
+            int h1b = 0;
+            int h2d = 0;
+            int h2b = 0;
+            for (int j = 0; j < 100; j++) {
+                PuzzleBoard b1 = new PuzzleBoard(3, depth);
+                PuzzleBoard b2 = b1.copy();
+                int[] r1 = solve(b1, 1);
+                int[] r2 = solve(b2, 2);
+                h1d += r1[0];
+                h1b += r1[1];
+                h2d += r2[0];
+                h2b += r2[1];
+                // h1depths[i] = r1[0];
+                // h1branch[i] = r1[1];
+                // h2depths[i] = r2[0];
+                // h2branch[i] = r2[1];
+            }
+            // int h1d = 0;
+            // int h1b = 0;
+            // int h2d = 0;
+            // int h2b = 0;
+            // for (int j = 0; j < 100; j++) {
+            //     h1d += h1depths.get(j);
+            //     h1b += h1branch.get(j);
+            //     h2d += h2depths.get(j);
+            //     h2b += h2branch.get(j);
+            // }
+            h1depthAvg[i-1] = h1d/100;
+            h1branchAvg[i-1] = h1b/100;
+            h2depthAvg[i-1] = h2d/100;
+            h2branchAvg[i-1] = h2b/100;
+
+            System.out.print(depth + "\t");
+            System.out.print(h1branchAvg[i-1] + "\t");
+            System.out.println(h2branchAvg[i-1]);
+
+            // System.out.println("Depth: " + depth);
+            // System.out.println("Avg h1 depth: " + h1depthAvg[i-1]);
+            // System.out.println("Avg h1 b*: " + h1branchAvg[i-1]);
+            // System.out.println("Avg h2 depth: " + h2depthAvg[i-1]);
+            // System.out.println("Avg h2 b*: " + h2branchAvg[i-1]);
         }
     }
 }
